@@ -1,0 +1,16 @@
+# ============================================================================
+# dsh-balance-status —— DSH bundle 挂载声明
+# ----------------------------------------------------------------------------
+# DSH 启动时按 bundle 层栈叠加各插件 patch，本文件把插件插入 Web profile 的
+# 配置树。客户端半边不需要在这里声明：宿主扫描已加载插件的 package.json，
+# 发现 dsh.client 后会自动把 exports["./client"] 加入浏览器启动图。
+#
+# 安装：
+#   dsh plugin --profile web add link:<本目录绝对路径>
+# 卸载：
+#   dsh plugin --profile web remove dsh-balance-status
+# ============================================================================
+
+- insert:
+    - id: dsh-balance-status
+      name: dsh-balance-status
