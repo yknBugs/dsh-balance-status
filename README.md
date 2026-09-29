@@ -43,10 +43,10 @@ pnpm 会把文件真实复制进 profile 的 `.pnpm` 目录，装完之后源码
 ```powershell
 # 1) 在插件目录里打包（只包含 files 字段列出的文件）
 cd <插件目录>
-pnpm pack            # 产出 dsh-balance-status-1.0.0.tgz
+pnpm pack            # 产出 dsh-balance-status-1.0.2.tgz（文件名随 package.json 的 version 变化）
 
 # 2) 安装该 tarball
-dsh plugin --profile web add file:<插件目录>\dsh-balance-status-1.0.0.tgz
+dsh plugin --profile web add file:<插件目录>\dsh-balance-status-1.0.2.tgz
 ```
 
 装完**重启 `dsh web`**，再 F5 刷新浏览器。
@@ -60,7 +60,7 @@ dsh plugin --profile web add file:<插件目录>\dsh-balance-status-1.0.0.tgz
 ```powershell
 cd <插件目录>
 pnpm pack
-dsh plugin --profile web add file:<插件目录>\dsh-balance-status-1.0.0.tgz   # 覆盖安装
+dsh plugin --profile web add file:<插件目录>\dsh-balance-status-1.0.2.tgz   # 覆盖安装
 ```
 
 然后重启 `dsh web`。
@@ -141,8 +141,8 @@ var REFRESH_MS = 300000   // 自动刷新间隔；设为 0 = 完全关闭自动�
 几个刻意的实现选择：
 
 - **浏览器半边是预构建产物**：DSH 的 `client-modules` 直接按字节提供 `exports["./client"]`，不做转换，所以该文件必须保持 `window.__ModuleLoader__.load({ id, factory })` 工厂格式，并且只 `require` 平台种子模块（`react`）。改它之后要重启 `dsh web` 生效，不需要任何构建步骤。
-- **状态行对齐**：自带状态行根节点有 `padding-top: 4px`，所以行内改为 `align-items: flex-start` 并给余额按钮同样的 `4px` 上边距，两者按钮顶边严格落在同一像素行。
-- **面板样式逐条照搬**自带状态浮窗（`ui-chat` 的 `stat-dialog.module.css`）：`var(--dsw-specific-menu)` 背景、`var(--dsw-elevation-prominent)` 阴影、12px 圆角、12/18 字号行高、`dl/dt/dd` 网格，保证与「缓存命中」浮窗观感一致。
+- **状态行对齐靠"结构相等"，不靠补偿像素**：余额按钮逐条照抄自带状态药丸（`ui-chat` 的 `StatsPills.module.css`）的 `padding: 1px 8px`、`line-height` 与字号表达式，因此两者盒子高度恒等；行内用 `align-items: center` 对齐，顶边自然重合。自带状态行把纵向内边距放在自己身上（0.1.5-rc.x）还是放在父级 dock 上（0.1.7-rc.2），都不需要改这里的数字。
+- **面板样式逐条照搬**自带状态浮窗（`ui-chat` 的 `stat-dialog.module.css`）：`var(--dsw-specific-menu)` 背景 **加** `backdrop-filter: var(--dsw-menu-backdrop-filter)`、`var(--dsw-elevation-prominent)` 阴影、`var(--dsw-radius-lg)` 圆角、12/18 字号行高、`dl/dt/dd` 网格，保证与「缓存命中」浮窗观感一致。自 0.1.7-rc.2 起菜单是"半透明填充 + 背景模糊"的材质，`--dsw-specific-menu` 指向带 alpha 的 `--dsw-menu-surface-fill`，**两者必须成对出现**，只抄背景不抄模糊就会真的变成透明面板。
 - **关闭面板不用全屏遮罩**：遮罩会吃掉滚轮事件导致无法浏览对话，改为 `document` 上的 `mousedown` / `keydown` 监听。
 - **余额查询走宿主进程的 `fetch`**，浏览器半边只访问本地只读路由，密钥永远不进浏览器。
 
@@ -152,7 +152,7 @@ var REFRESH_MS = 300000   // 自动刷新间隔；设为 0 = 完全关闭自动�
 
 ## 兼容性
 
-按 DSH `0.1.5-rc.2` 编写，依赖以下稳定契约：
+按 DSH `0.1.7-rc.2` 编写（0.1.5-rc.x 亦可运行），依赖以下稳定契约：
 
 - 插槽 `conversation.composer.dock`（自带状态行的位置）与 `shell.overlay`（框架级浮层）；
 - 宿主服务 `webServer`、`credentials`、`settings`；

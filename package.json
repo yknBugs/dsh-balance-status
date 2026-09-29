@@ -1,6 +1,6 @@
 {
   "name": "dsh-balance-status",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "在 DSH Web 底部状态行（x 轮 x 步 · tok/s · tok · 缓存命中）之后追加 DeepSeek 账户余额，左键单击弹出用量详情",
   "keywords": [
     "dsh",
